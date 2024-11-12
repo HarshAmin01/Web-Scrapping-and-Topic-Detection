@@ -120,6 +120,9 @@ To find the "sweet spot" for batch size, we conducted experiments with varying b
 
 #### Step 5: Experimenting with Batch Sizes to Optimize Performance
 
+![image](https://github.com/user-attachments/assets/48f16954-e55e-4c12-93c2-2d712a99b5f9)
+
+
 we optimized our model by leveraging batch processing, but we discovered that batch size could significantly impact the performance. Therefore, we set out to conduct a systematic experiment to determine the optimal batch size that maximizes speed without overloading our system’s resources.
 
 - Why Batch Size Matters
@@ -132,6 +135,9 @@ Extracts a sample of texts based on the current batch size.
 Records the processing time for classifying a batch of that size.
 Logs the results (batch size and processing time) to a dataframe for analysis.
 The output of this experiment will give us a clear understanding of how batch size affects processing time, which can help in choosing an efficient batch size for the final deployment.
+![image](https://github.com/user-attachments/assets/cb175009-b782-4e4b-9eb2-3d5137bffd5c)
+
+
 
 #### Step 6: Directly Leveraging the Model's Forward Pass for Increased Efficiency
 After experimenting with batch sizes in Step 5, we turned our focus to further optimizing the inference process by using the model’s direct forward pass. This approach bypasses the usual pipeline interface in Hugging Face’s Transformers library, giving us more control and, ultimately, increased efficiency. The forward pass method is particularly effective for batch processing and helps reduce latency by avoiding the overhead associated with the pipeline method.
@@ -142,6 +148,13 @@ Using the pipeline interface from Hugging Face is convenient, but it comes with 
 - Control Batch Processing: Custom batch management allows us to better utilize GPU resources.
 - Reduce Overhead: Avoiding pipeline wrappers minimizes the computational overhead, making it more efficient, especially for repetitive tasks.
 - Optimize Label Matching: By precomputing label tokens, we streamline the process of scoring and ranking candidate labels, which is particularly useful for tasks like zero-shot classification.
+
+![image](https://github.com/user-attachments/assets/2319a002-b40a-411b-b086-70fbef4000e9)
+![image](https://github.com/user-attachments/assets/4e795e60-26db-4f65-9af0-1370c15bca9f)
+![image](https://github.com/user-attachments/assets/3e34f5eb-5e90-4c17-83a0-fd58b3cfbdd4)
+
+### Based on the expirement we can say that there is a randomness in th results as we have selected data randomly to provide it in batches.
+### But in colusion it is ideal to use batch size of 15 to get the effective result with limited amount of time.
 
 #### Implementing the Forward Pass for Batch Processing
 Here’s how we set up the model for a more efficient forward pass:
@@ -154,6 +167,7 @@ Candidate labels are tokenized and cached in advance. This pre-tokenization is s
 
 - Batch Classification Function:
 The classify_batch_direct function takes a batch of texts, tokenizes them, runs the forward pass on the model, and outputs predicted labels. Using torch.no_grad() ensures that no gradients are computed, which saves memory and speeds up inference.
+![image](https://github.com/user-attachments/assets/51a5f7b4-b7c4-4674-b3b0-93cda12c22f0)
 
  ## Conclusion
 In this project, we tackled the challenges of efficiently classifying large amounts of Reddit data across various topics using a zero-shot classification model. By systematically optimizing each component of our pipeline, we achieved significant improvements in processing speed and scalability. Here’s a summary of our journey and findings:
@@ -168,9 +182,12 @@ In this project, we tackled the challenges of efficiently classifying large amou
 
 - Performance Gains: Through these optimizations, we achieved substantial speed improvements. Using the model’s forward pass allowed us to scale up our batch sizes while minimizing the linear slowdown, which was a limitation in the pipeline approach.
 
+![image](https://github.com/user-attachments/assets/8587f7eb-3ee1-4021-ab4d-e7d03ea5aaeb)
+
+
 ### Lessons Learned:
 
 - Batch Processing: Optimizing batch size is crucial when working with GPU resources. Small batch sizes underutilize GPU capacity, while excessively large batches lead to linear slowdowns.
 - Pipeline vs. Direct Model Access: Hugging Face pipelines are convenient but come with performance trade-offs, particularly for high-throughput tasks. Direct access to the model’s forward pass provides greater control and efficiency, making it ideal for large datasets.
-- 
+
 In conclusion, by refining our batch processing strategy, leveraging the model’s forward pass, and carefully tuning our process, we developed an efficient, scalable classification solution. These steps demonstrate the importance of understanding both the hardware limitations and the software architecture to optimize deep learning tasks effectively. This optimized approach provides a strong foundation for future classification tasks, especially when applied to large-scale, real-world datasets like those scraped from social media platforms.
